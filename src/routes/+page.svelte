@@ -1,20 +1,18 @@
 <script lang="ts">
-  import { random_pic, wait, type IPicture } from "$lib";
+  import { random_pic, shuffle, type IPicture } from "$lib";
+  import PostCard from "$lib/comp/PostCard.svelte";
   import { onMount } from "svelte";
 
   let pictures: Array<IPicture> = [];
 
-  //   let columns: Array<IPicture[]> = [];
   $: columns = Array(4)
     .fill(0)
     .map((_, i) => pictures.filter((_, j) => j % 4 === i));
 
   async function init() {
-    for (let i = 0; i < 10; i++) {
-      let pics = Array.from({ length: 10 }, random_pic);
-      pictures = [...pictures, ...pics];
-      await wait(500);
-    }
+    let all: Array<IPicture> = Array.from({ length: 200 }, random_pic);
+    shuffle(all);
+    pictures = all;
   }
 
   onMount(init);
@@ -23,8 +21,8 @@
 <div class="board">
   {#each columns as column}
     <section>
-      {#each column as { url, type }}
-        <img src={url} data-type={type} alt="" />
+      {#each column as pic}
+        <PostCard {pic} />
       {/each}
     </section>
   {/each}
@@ -35,18 +33,11 @@
     padding: 2rem;
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    grid-auto-flow: dense;
-    gap: 2rem;
+    gap: 1.5rem;
     > section {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 2rem;
-
-      > img {
-        max-width: 100%;
-        border-radius: calc(1rem * 2);
-        display: block;
-      }
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
     }
   }
 </style>
